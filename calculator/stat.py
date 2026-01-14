@@ -1,6 +1,6 @@
 class Stat:
-    QUICK = "Quick"
-    POWER = "Power"
+    QUICK = "Quick Attack"
+    POWER = "Power Attack"
     SET = "Set"
     SERVE = "Serve"
     

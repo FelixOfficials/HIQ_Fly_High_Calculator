@@ -10,11 +10,13 @@ class Skill:
     def addition_percentage(self):
         if self.level <= self.max_level:
             if self.cooldown > 1:
-                return (self.skill_numbers[self.level] - 1) / (self.cooldown / 2)
+                return (self.skill_numbers[self.level - 1] - 1) / (self.cooldown / 2)
             else:
-                return (self.skill_numbers[self.level] - 1)
+                return (self.skill_numbers[self.level - 1])
     
     def get_modifier(self, stat, base):
         if self.affected_stat != stat:
             return 0
         return base * self.addition_percentage()
+    
+    # Fix this part

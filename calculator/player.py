@@ -23,6 +23,14 @@ class Player:
             Stat.RECEIVE: bsc_receive,
             Stat.BLOCK: bsc_block,
             Stat.SAVE: bsc_save,
+
+            Stat.AWARENESS: bsc_awareness,
+            Stat.STRENGTH: bsc_strength,
+            Stat.ATTACKTECHNIQUE: bsc_atk_tech,
+            
+            Stat.REFLEX: bsc_reflex,
+            Stat.SPIRIT: bsc_spirit,
+            Stat.DEFENSETECHNIQUE: bsc_def_tech,
         }
         
         self.add_stats = {
@@ -34,23 +42,26 @@ class Player:
             Stat.RECEIVE: self._stat_addition(Stat.RECEIVE),
             Stat.BLOCK: self._stat_addition(Stat.BLOCK),
             Stat.SAVE: self._stat_addition(Stat.SAVE),
-        }
-        
-        self.base_match_stats = {
-            Stat.AWARENESS: bsc_awareness,
-            Stat.STRENGTH: bsc_strength,
-            Stat.ATTACKTECHNIQUE: bsc_atk_tech,
             
-            Stat.REFLEX: bsc_reflex,
-            Stat.SPIRIT: bsc_spirit,
-            Stat.DEFENSETECHNIQUE: bsc_def_tech,
+            Stat.AWARENESS: self._stat_addition(Stat.AWARENESS),
+            Stat.STRENGTH: self._stat_addition(Stat.STRENGTH),
+            Stat.ATTACKTECHNIQUE: self._stat_addition(Stat.ATTACKTECHNIQUE),
+            
+            Stat.REFLEX: self._stat_addition(Stat.REFLEX),
+            Stat.SPIRIT: self._stat_addition(Stat.SPIRIT),
+            Stat.DEFENSETECHNIQUE: self._stat_addition(Stat.DEFENSETECHNIQUE),
         }
 
     def stat_base(self, stat):
         return self.base_stats[stat]
 
     def rating(self):
-        return sum(self.base_stats.values()) + sum(self.add_stats.values())
+        if self.base_stats[Stat.QUICK] > self.base_stats[Stat.POWER]:
+            use_stat = Stat.QUICK
+        else:
+            use_stat = Stat.POWER
+        rating_order =[use_stat, Stat.SET, Stat.SERVE, Stat.RECEIVE, Stat.BLOCK, Stat.SAVE]
+        return sum(self.base_stats[stat] + self.add_stats[stat] for stat in rating_order)
     
     def basic_total(self):
         return sum(self.base_stats.values())

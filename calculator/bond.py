@@ -5,7 +5,10 @@ class Bond:
         self.bond_buff = bond_buff
     
     def active(self):
-        return self.bond_buff[self.level - 1]
+        if self.level > 0:
+            return self.bond_buff[self.level - 1]
+        else:
+            return {}
     
     def get_modifier(self, stat, base):
         active = self.active()
