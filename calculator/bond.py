@@ -10,14 +10,12 @@ class Bond:
         else:
             return {}
     
-    def get_modifier(self, stat, base):
-        active = self.active()
+    def get_bonus(self, base, active):
         addition = 0
         
-        if "Basic%" in active:
-            addition += base * active["Basic%"]
-        if stat + "%" in active:
-            addition += base * active[stat + "%"]
-        if stat in active:
-            addition += active[stat]
+        for bonus in active.keys():
+            if "%" in bonus:
+                addition += base * active[bonus]
+            else:
+                addition += active[bonus]
         return addition

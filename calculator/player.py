@@ -33,41 +33,78 @@ class Player:
             Stat.DEFENSETECHNIQUE: bsc_def_tech,
         }
         
-        self.add_stats = {
-            Stat.QUICK: self._stat_addition(Stat.QUICK),
-            Stat.POWER: self._stat_addition(Stat.POWER),
-            Stat.SET: self._stat_addition(Stat.SET),
-            Stat.SERVE: self._stat_addition(Stat.SERVE),
-            
-            Stat.RECEIVE: self._stat_addition(Stat.RECEIVE),
-            Stat.BLOCK: self._stat_addition(Stat.BLOCK),
-            Stat.SAVE: self._stat_addition(Stat.SAVE),
-            
-            Stat.AWARENESS: self._stat_addition(Stat.AWARENESS),
-            Stat.STRENGTH: self._stat_addition(Stat.STRENGTH),
-            Stat.ATTACKTECHNIQUE: self._stat_addition(Stat.ATTACKTECHNIQUE),
-            
-            Stat.REFLEX: self._stat_addition(Stat.REFLEX),
-            Stat.SPIRIT: self._stat_addition(Stat.SPIRIT),
-            Stat.DEFENSETECHNIQUE: self._stat_addition(Stat.DEFENSETECHNIQUE),
+        self.bond_bonus = {
+            stat: 0.0 for stat in Stat
         }
+        
+        self.training_bonus = {
+            stat: 0.0 for stat in Stat
+        }        
+        
+        self.passive_skill_bonus = {
+            stat: 0.0 for stat in Stat
+        }
+        
+        self.active_skill_bonus = {
+            stat: 0.0 for stat in Stat
+        }
+        
+        self.skillres_bonus = {
+            stat: 0.0 for stat in Stat
+        }
+
+        self.potential_bonus = {
+            stat: 0.0 for stat in Stat
+        }
+        
+        self.memory_bonus = {
+            stat: 0.0 for stat in Stat
+        }    
+        
+        self.use_stat = Stat.QUICK if self.base_stats[Stat.QUICK] > self.base_stats[Stat.POWER] else Stat.POWER
+        self._initial_run = False
 
     def stat_base(self, stat):
         return self.base_stats[stat]
+    
+    def passive_calc(self):
+        for skill in self.skills:
+            if skill.tag == "Passive":
+                cur_stat = skill.affected_stat
+                self.passive_skill_bonus[cur_stat] = skill.get_modifier(cur_stat, self.base_stats[cur_stat])
+                
+    def active_calc(self):
+        for skill in self.skills:
+            if skill.tag == "Active":
+                cur_stat = skill.affected_stat
+                self.active_skill_bonus[cur_stat] = skill.get_modifier(cur_stat, self.base_stats[cur_stat] + self.passive_skill_bonus[cur_stat])
+                print(self.active_skill_bonus[cur_stat])
+                
+    def bond_calc(self):
+        for bond in self.bonds:
+            cur_active = bond.active()
+            cur_stat = list(cur_active.keys())[0]
+            self.bond_bonus[cur_stat] = bond.get_bonus(self.base_stats[cur_stat], cur_active)
+            
 
     def rating(self):
-        if self.base_stats[Stat.QUICK] > self.base_stats[Stat.POWER]:
-            use_stat = Stat.QUICK
-        else:
-            use_stat = Stat.POWER
-        rating_order =[use_stat, Stat.SET, Stat.SERVE, Stat.RECEIVE, Stat.BLOCK, Stat.SAVE]
-        return sum(self.base_stats[stat] + self.add_stats[stat] for stat in rating_order)
+        self.calculate()      
+        total_rating = 0
+        rating_order = [self.use_stat, Stat.SET, Stat.SERVE, Stat.RECEIVE, Stat.BLOCK, Stat.SAVE]
+        for order in rating_order:
+            total_rating += self.base_stats[order] + self.passive_skill_bonus[order] + self.active_skill_bonus[order]
+        return total_rating
+    
+    def calculate(self):
+        if self._initial_run == False:
+            self.bond_calc()
+            self.passive_calc()
+            self.active_calc()
+            self._initial_run = True
     
     def basic_total(self):
         return sum(self.base_stats.values())
 
-    
-    
     def _stat_addition(self, stat):
         base = self.base_stats[stat]
         addition = 0
@@ -75,8 +112,7 @@ class Player:
         addition += self.training.get_modifier(stat, base)
 
         for skill in self.skills:
-            if stat != "Serve":
-                addition += skill.get_modifier(stat, base)
+            addition += skill.get_modifier(stat, base)
         
         addition += self.skillres.get_modifier(stat, base)
             
@@ -88,10 +124,10 @@ class Player:
     def update_stat_addition(self, stat):
         self.add_stats[stat] = self._stat_addition(stat)
         
-    def stat_total(self, stat):
+    def stat_display(self, stat):
         base = self.base_stats[stat]
-        added = self.add_stats[stat]
-        return base + added
+        passive = self.passive_skill_bonus[stat]
+        return base + passive
 
 
 
@@ -101,12 +137,12 @@ class Player:
     def __str__(self):
         return f"""{self.name} - Player Rating:\t{self.rating()}
 \033[4mBasic Attack Stats\033[0m
-Quick Attack:\t{self.base_stats[Stat.QUICK]} + {round(self.add_stats[Stat.QUICK], 1)}\t{round(self.stat_total(Stat.QUICK))}
-Power Attack:\t{self.base_stats[Stat.POWER]} + {round(self.add_stats[Stat.POWER], 1)}\t{round(self.stat_total(Stat.POWER))}
-Set:\t\t{self.base_stats[Stat.SET]} + {round(self.add_stats[Stat.SET], 1)}\t{round(self.stat_total(Stat.SET))}
-Serve:\t\t{self.base_stats[Stat.SERVE]} + {round(self.add_stats[Stat.SERVE], 1)}\t{round(self.stat_total(Stat.SERVE))}
+Quick Attack:\t{self.base_stats[Stat.QUICK]} + {round(self.passive_skill_bonus[Stat.QUICK], 1)}\t{round(self.stat_display(Stat.QUICK))}
+Power Attack:\t{self.base_stats[Stat.POWER]} + {round(self.passive_skill_bonus[Stat.POWER], 1)}\t{round(self.stat_display(Stat.POWER))}
+Set:\t\t{self.base_stats[Stat.SET]} + {round(self.passive_skill_bonus[Stat.SET], 1)}\t{round(self.stat_display(Stat.SET))}
+Serve:\t\t{self.base_stats[Stat.SERVE]} + {round(self.passive_skill_bonus[Stat.SERVE], 1)}\t{round(self.stat_display(Stat.SERVE))}
                     
 \033[4mBasic Defense Stats\033[0m
-Receive:\t{self.base_stats[Stat.RECEIVE]} + {round(self.add_stats[Stat.RECEIVE], 1)}\t{round(self.stat_total(Stat.RECEIVE))}
-Block:\t\t{self.base_stats[Stat.BLOCK]} + {round(self.add_stats[Stat.BLOCK], 1)}\t{round(self.stat_total(Stat.BLOCK))}
-Save:\t\t{self.base_stats[Stat.SAVE]} + {round(self.add_stats[Stat.SAVE], 1)}\t{round(self.stat_total(Stat.SAVE))}"""
+Receive:\t{self.base_stats[Stat.RECEIVE]} + {round(self.passive_skill_bonus[Stat.RECEIVE], 1)}\t{round(self.stat_display(Stat.RECEIVE))}
+Block:\t\t{self.base_stats[Stat.BLOCK]} + {round(self.passive_skill_bonus[Stat.BLOCK], 1)}\t{round(self.stat_display(Stat.BLOCK))}
+Save:\t\t{self.base_stats[Stat.SAVE]} + {round(self.passive_skill_bonus[Stat.SAVE], 1)}\t{round(self.stat_display(Stat.SAVE))}"""

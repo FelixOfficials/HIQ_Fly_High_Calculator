@@ -11,14 +11,14 @@ def main():
 
     skill1 = Skill("Great King's Set", 1, 6, [1.2, 1.35, 1.5], "Set")
     skill2 = Skill("Great King's Dump", 1, 6, [1.15, 1.350, 1.45], "Set")
-    skill3 = Skill("Court Commander", 1, 1, [0.1, 0.14, 0.18], "Placeholder")
+    skill3 = Skill("Court Commander", 1, 1, [0.1, 0.14, 0.18], "Awareness")
     skill4 = Skill("Great King's Jump Serve", 1, 8, [2.6, 2.75, 2.9, 3.05, 3.2], "Serve")
 
     oikawa_skills = [skill1, skill2, skill3, skill4]
     oikawa_bonds = [bond1, bond2, bond3, bond4]
     oikawa = Player("Oikawa Toru", ["Power Attack", "Serve", "Setter"], 212, 1533, 1627, 1705, 1378, 1530, 1290, 0.05, 0, 0, 0, 0, 0, oikawa_training, oikawa_skills, oikawa_skillres, oikawa_bonds)
     oikawa_player_rating = 20927
-    # print(oikawa)
+    print(oikawa)
 
 
 
@@ -74,7 +74,7 @@ def main():
     # kosuke_skills = []
     kosuke = Player("Kosuke Tashiro", ["Block"], 78, 54, 68, 72, 70, 82, 66, 0, 0, 0, 0.05, 0, 0, kosuke_training, kosuke_skills, kosuke_skillres, kosuke_bonds)
 
-    print(kosuke)
+    # print(kosuke)
 
 if __name__ == "__main__":
     main()

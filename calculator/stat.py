@@ -1,4 +1,6 @@
-class Stat:
+from enum import Enum
+
+class Stat(Enum):
     QUICK = "Quick Attack"
     POWER = "Power Attack"
     SET = "Set"
